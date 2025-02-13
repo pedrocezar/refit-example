@@ -11,13 +11,11 @@ using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Logging - moved before builder.Build()
 builder.Host.UseSerilog((context, services, logger) =>
 {
     logger.ReadFrom.Configuration(context.Configuration).ReadFrom.Services(services);
 });
 
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -27,13 +25,12 @@ builder.Services.AddRouting(options =>
     options.LowercaseQueryStrings = true;
 });
 
-// Configure Services
 builder.Services.AddScoped<IAddressService, AddressService>();
 
-// Configure Refit with logging and error handling
-builder.Services.AddTransient<IntegrationHandler>();
-
 builder.Services.AddMemoryCache();
+
+builder.Services.AddTransient<CachingIntegrationHandler>();
+builder.Services.AddTransient<IntegrationHandler>();
 
 builder.Services.AddRefitClient<ICepIntegration>(options =>
     RefitSettingsFactory.CreateRefitSettings(
@@ -54,11 +51,9 @@ builder.Services.AddRefitClient<ICepIntegration>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Add error handling middleware
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
