@@ -1,4 +1,3 @@
-using CompanyName.ProductName.Domain.Exceptions;
 using CompanyName.ProductName.Infrastructure.Handlers;
 using CompanyName.ProductName.Infrastructure.Integrations;
 using CompanyName.ProductName.Infrastructure.Settings;
@@ -13,23 +12,23 @@ namespace CompanyName.ProductName.Tests.Infrastructure
     public class CepServiceTests
     {
         private readonly ICepIntegration _cepService;
-        private readonly Mock<ILogger<LoggingHandler>> _loggerMock;
+        private readonly Mock<ILogger<IntegrationHandler>> _loggerMock;
 
         public CepServiceTests()
         {
-            _loggerMock = new Mock<ILogger<LoggingHandler>>();
+            _loggerMock = new Mock<ILogger<IntegrationHandler>>();
             
             var services = new ServiceCollection();
             services.AddSingleton(_loggerMock.Object);
-            services.AddTransient<LoggingHandler>();
+            services.AddTransient<IntegrationHandler>();
             
-            services.AddRefitClient<ICepIntegration>(RefitSettingsFactory.CreateRefitSettings(_loggerMock.Object))
+            services.AddRefitClient<ICepIntegration>(RefitSettingsFactory.CreateRefitSettings(_loggerMock.Object, nameof(ICepIntegration)))
                 .ConfigureHttpClient(c => 
                 {
                     c.BaseAddress = new Uri("https://viacep.com.br");
                     c.Timeout = TimeSpan.FromSeconds(30);
                 })
-                .AddHttpMessageHandler<LoggingHandler>();
+                .AddHttpMessageHandler<IntegrationHandler>();
 
             var serviceProvider = services.BuildServiceProvider();
             _cepService = serviceProvider.GetRequiredService<ICepIntegration>();

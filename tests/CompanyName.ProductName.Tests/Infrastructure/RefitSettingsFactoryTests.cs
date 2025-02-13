@@ -19,7 +19,7 @@ public class RefitSettingsFactoryTests
     public void CreateRefitSettings_ShouldReturnValidSettings()
     {
         // Act
-        var settings = RefitSettingsFactory.CreateRefitSettings(_loggerMock.Object);
+        var settings = RefitSettingsFactory.CreateRefitSettings(_loggerMock.Object, "test");
 
         // Assert
         Assert.NotNull(settings);
@@ -30,6 +30,6 @@ public class RefitSettingsFactoryTests
     public void CreateRefitSettings_WithNullLogger_ShouldThrowApiException()
     {
         // Act & Assert
-        Assert.Throws<DomainException>(() => RefitSettingsFactory.CreateRefitSettings(null));
+        Assert.Throws<DomainException>(() => RefitSettingsFactory.CreateRefitSettings(null, null));
     }
 } 

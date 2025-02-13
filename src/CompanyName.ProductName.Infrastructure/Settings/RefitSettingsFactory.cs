@@ -9,7 +9,7 @@ namespace CompanyName.ProductName.Infrastructure.Settings;
 
 public static class RefitSettingsFactory
 {
-    public static RefitSettings CreateRefitSettings(ILogger logger)
+    public static RefitSettings CreateRefitSettings(ILogger logger, string integrationName)
     {
         if (logger == null)
             throw new DomainException("Logger cannot be null");
@@ -34,7 +34,7 @@ public static class RefitSettingsFactory
                     HttpStatusCode.NotFound => new NotFoundException(errorMessage),
                     HttpStatusCode.BadRequest => new DomainException(errorMessage),
                     _ => new IntegrationException(
-                        "ViaCEP",
+                        integrationName,
                         errorMessage,
                         (int)statusCode)
                 };

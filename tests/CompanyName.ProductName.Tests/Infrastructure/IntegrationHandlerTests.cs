@@ -8,17 +8,17 @@ using Xunit;
 
 namespace CompanyName.ProductName.Tests.Infrastructure;
 
-public class LoggingHandlerTests
+public class IntegrationHandlerTests
 {
-    private readonly Mock<ILogger<LoggingHandler>> _loggerMock;
+    private readonly Mock<ILogger<IntegrationHandler>> _loggerMock;
     private readonly Mock<HttpMessageHandler> _innerHandlerMock;
     private readonly HttpMessageHandler _handler;
 
-    public LoggingHandlerTests()
+    public IntegrationHandlerTests()
     {
-        _loggerMock = new Mock<ILogger<LoggingHandler>>();
+        _loggerMock = new Mock<ILogger<IntegrationHandler>>();
         _innerHandlerMock = new Mock<HttpMessageHandler>();
-        _handler = new LoggingHandler(_loggerMock.Object)
+        _handler = new IntegrationHandler(_loggerMock.Object)
         {
             InnerHandler = _innerHandlerMock.Object
         };

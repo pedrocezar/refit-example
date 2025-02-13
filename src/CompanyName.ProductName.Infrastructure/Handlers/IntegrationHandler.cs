@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace CompanyName.ProductName.Infrastructure.Handlers;
 
-public class LoggingHandler(ILogger<LoggingHandler> _logger) : DelegatingHandler
+public class IntegrationHandler(ILogger<IntegrationHandler> _logger) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
@@ -18,8 +18,14 @@ public class LoggingHandler(ILogger<LoggingHandler> _logger) : DelegatingHandler
                 request.RequestUri,
                 correlationId);
 
+
             var stopwatch = Stopwatch.StartNew();
+
+            request.Headers.Add("Authorization", "***WRITE YOUR API READ ACCESS TOKEN HERE***");
+            request.Headers.Add("CorrelationId", correlationId);
+
             var response = await base.SendAsync(request, cancellationToken);
+
             stopwatch.Stop();
 
             _logger.LogInformation(

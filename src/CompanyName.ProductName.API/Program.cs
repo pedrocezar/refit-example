@@ -6,6 +6,8 @@ using CompanyName.ProductName.Application.Services.Interfaces;
 using CompanyName.ProductName.Infrastructure.Integrations;
 using Refit;
 using Serilog;
+using Polly.Extensions.Http;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,18 +31,25 @@ builder.Services.AddRouting(options =>
 builder.Services.AddScoped<IAddressService, AddressService>();
 
 // Configure Refit with logging and error handling
-builder.Services.AddTransient<LoggingHandler>();
+builder.Services.AddTransient<IntegrationHandler>();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddRefitClient<ICepIntegration>(options =>
     RefitSettingsFactory.CreateRefitSettings(
-        options.GetRequiredService<ILoggerFactory>().CreateLogger("RefitClient")
+        options.GetRequiredService<ILoggerFactory>().CreateLogger("RefitClient"),
+        nameof(ICepIntegration)
     ))
     .ConfigureHttpClient(c =>
     {
         c.BaseAddress = new Uri(builder.Configuration["CepIntegration:BaseAddress"]);
         c.Timeout = TimeSpan.FromSeconds(30);
     })
-    .AddHttpMessageHandler<LoggingHandler>()
+    .AddPolicyHandler(HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+    .AddHttpMessageHandler<IntegrationHandler>()
+    .AddHttpMessageHandler<CachingIntegrationHandler>()
     .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
 var app = builder.Build();
