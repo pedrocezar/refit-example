@@ -13,7 +13,7 @@ public class LoggingHandler(ILogger<LoggingHandler> _logger) : DelegatingHandler
         try
         {
             _logger.LogInformation(
-                "HTTP {Method} {Uri} started. CorrelationId: {CorrelationId}",
+                "HTTP Request {Method} {Uri} started. CorrelationId: {CorrelationId}",
                 request.Method,
                 request.RequestUri,
                 correlationId);
@@ -23,7 +23,7 @@ public class LoggingHandler(ILogger<LoggingHandler> _logger) : DelegatingHandler
             stopwatch.Stop();
 
             _logger.LogInformation(
-                "HTTP {Method} {Uri} finished in {ElapsedMilliseconds}ms with status code {StatusCode}. CorrelationId: {CorrelationId}",
+                "HTTP Response {Method} {Uri} finished in {ElapsedMilliseconds}ms with status code {StatusCode}. CorrelationId: {CorrelationId}",
                 request.Method,
                 request.RequestUri,
                 stopwatch.ElapsedMilliseconds,
@@ -36,7 +36,7 @@ public class LoggingHandler(ILogger<LoggingHandler> _logger) : DelegatingHandler
         {
             _logger.LogError(
                 ex,
-                "HTTP {Method} {Uri} failed. CorrelationId: {CorrelationId}",
+                "HTTP Request failed. Method: {Method}, Uri: {Uri}, CorrelationId: {CorrelationId}",
                 request.Method,
                 request.RequestUri,
                 correlationId);

@@ -32,28 +32,29 @@ public class ErrorHandlingMiddleware(RequestDelegate _next, ILogger<ErrorHandlin
         switch (exception)
         {
             case NotFoundException notFoundEx:
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = 404;
                 errorResponse.Message = notFoundEx.Message;
                 break;
 
             case DomainException domainEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.StatusCode = 400;
                 errorResponse.Message = domainEx.Message;
                 break;
 
-            case ArgumentException argEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                errorResponse.Message = argEx.Message;
+            case Refit.ApiException:
+                response.StatusCode = 422;
+                errorResponse.Message = "Unprocessable Entity";
                 break;
 
             default:
                 _logger.LogError(exception, "An unexpected error occurred");
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                response.StatusCode = 500;
                 errorResponse.Message = "An unexpected error occurred";
                 break;
         }
 
-        var result = JsonSerializer.Serialize(errorResponse);
+        var result = JsonSerializer.Serialize(errorResponse, 
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         await response.WriteAsync(result);
     }
 }

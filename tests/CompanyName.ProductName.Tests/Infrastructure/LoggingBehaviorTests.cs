@@ -1,3 +1,4 @@
+using CompanyName.ProductName.Domain.Exceptions;
 using CompanyName.ProductName.Infrastructure.Handlers;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -53,14 +54,27 @@ namespace CompanyName.ProductName.Tests.Infrastructure
                 Times.Once);
         }
 
-        private class TestRequest : IRequest<TestResponse>
+        [Fact]
+        public async Task Handle_ShouldLogException()
+        {
+            // Arrange
+            var request = new TestRequest { Data = "Test" };
+            var exception = new DomainException("Test exception");
+            
+            RequestHandlerDelegate<TestResponse> next = () => throw exception;
+
+            // Act & Assert
+            await Assert.ThrowsAsync<DomainException>(() => _loggingBehavior.Handle(request, next, CancellationToken.None));
+        }
+
+        public class TestRequest : IRequest<TestResponse>
         {
             public string Data { get; set; }
         }
 
-        private class TestResponse
+        public class TestResponse
         {
             public string Result { get; set; }
         }
     }
-} 
+}

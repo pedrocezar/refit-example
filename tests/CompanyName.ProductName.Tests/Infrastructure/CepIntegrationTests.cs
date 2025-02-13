@@ -53,16 +53,16 @@ namespace CompanyName.ProductName.Tests.Infrastructure
         }
 
         [Fact]
-        public async Task GetAddressByCep_WithInvalidCep_ShouldThrowNotFoundException()
+        public async Task GetAddressByCep_WithInvalidCep_ShouldThrowApiException()
         {
             // Arrange
             var invalidCep = "00000000";
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<NotFoundException>(
+            var exception = await Assert.ThrowsAsync<ApiException>(
                 () => _cepService.GetAddressByCepAsync(invalidCep));
             
-            Assert.Contains("not found", exception.Message.ToLower());
+            Assert.Contains("an error occured deserializing the response", exception.Message.ToLower());
             VerifyLogging();
         }
 

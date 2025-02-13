@@ -1,3 +1,4 @@
+using CompanyName.ProductName.Domain.Exceptions;
 using CompanyName.ProductName.Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -26,9 +27,9 @@ public class RefitSettingsFactoryTests
     }
 
     [Fact]
-    public void CreateRefitSettings_WithNullLogger_ShouldThrowArgumentNullException()
+    public void CreateRefitSettings_WithNullLogger_ShouldThrowApiException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => RefitSettingsFactory.CreateRefitSettings(null));
+        Assert.Throws<DomainException>(() => RefitSettingsFactory.CreateRefitSettings(null));
     }
 } 

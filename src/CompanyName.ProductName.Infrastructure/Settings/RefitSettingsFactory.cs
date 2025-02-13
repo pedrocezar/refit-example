@@ -11,6 +11,9 @@ public static class RefitSettingsFactory
 {
     public static RefitSettings CreateRefitSettings(ILogger logger)
     {
+        if (logger == null)
+            throw new DomainException("Logger cannot be null");
+
         return new RefitSettings
         {
             ExceptionFactory = async message =>

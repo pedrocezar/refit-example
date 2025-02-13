@@ -1,3 +1,4 @@
+using CompanyName.ProductName.Domain.Exceptions;
 using CompanyName.ProductName.Infrastructure.Handlers;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -78,7 +79,7 @@ public class LoggingHandlerTests
             .ThrowsAsync(expectedException);
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(async () =>
+        await Assert.ThrowsAsync<DomainException>(async () =>
             await client.GetAsync("http://test.com"));
 
         _loggerMock.Verify(
