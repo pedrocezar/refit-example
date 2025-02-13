@@ -47,8 +47,8 @@ src/
 ## 🛠️ Technical Stack
 
 - **Framework**: .NET 8
-- **API Integration**: Refit 7.0
-- **Logging**: Serilog 3.1.1
+- **API Integration**: Refit 8.0
+- **Logging**: Serilog 4.2.0
   - Console sink
   - File sink with daily rolling
   - Environment enrichers
@@ -104,38 +104,27 @@ src/
 ### Refit Integration
 
 ```csharp
-builder.Services.AddRefitClient<ICepIntegration>(RefitSettingsFactory.CreateRefitSettings(logger))
-    .ConfigureHttpClient(c => 
+builder.Services.AddRefitClient<ICepIntegration>(options =>
+    RefitSettingsFactory.CreateRefitSettings(
+        options.GetRequiredService<ILoggerFactory>().CreateLogger("RefitClient"),
+        nameof(ICepIntegration)
+    ))
+    .ConfigureHttpClient(c =>
     {
+        // Set the base address from configuration
         c.BaseAddress = new Uri(builder.Configuration["CepIntegration:BaseAddress"]);
-        c.Timeout = TimeSpan.FromSeconds(30);
+        c.Timeout = TimeSpan.FromSeconds(30); // Set timeout to 30 seconds
     })
-    .AddHttpMessageHandler<LoggingHandler>();
-```
-
-### Logging Handler
-
-```csharp
-public class LoggingHandler : DelegatingHandler
-{
-    private readonly ILogger _logger;
-
-    protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request, 
-        CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("HTTP {Method} {Url}", 
-            request.Method, 
-            request.RequestUri);
-
-        var response = await base.SendAsync(request, cancellationToken);
-
-        _logger.LogInformation("HTTP Response Status: {StatusCode}", 
-            response.StatusCode);
-
-        return response;
-    }
-}
+    // Add retry policy for transient HTTP errors
+    // Will retry 3 times with exponential backoff (2^attempt seconds)
+    .AddPolicyHandler(HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))))
+    // Add HTTP message handlers in the pipeline
+    .AddHttpMessageHandler<IntegrationHandler>()
+    .AddHttpMessageHandler<CachingIntegrationHandler>()
+    // Set the handler lifetime to 5 minutes
+    .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 ```
 
 ## 🧪 Detailed Test Structure
