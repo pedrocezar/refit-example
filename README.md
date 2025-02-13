@@ -1,5 +1,3 @@
-Você está correto. Vou continuar adicionando o conteúdo ao README.md existente:
-
 # CEP Integration Service
 
 A .NET 8 Web API service that integrates with the ViaCEP API to provide Brazilian postal code (CEP) lookup functionality. Built using Clean Architecture principles and modern .NET practices.
@@ -276,11 +274,3 @@ Logging is implemented using Serilog with structured logging format:
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 🔜 Future Improvements
-
-1. Implement caching
-2. Add rate limiting
-3. Enhance monitoring
-4. Add more integration tests
-5. Implement circuit breaker pattern
